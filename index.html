@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Password Generator</h2>
+
+<label for="key">Enter Key:</label>
+<input type="text" id="key">
+
+<label for="passwordLength">Password Length:</label>
+<input type="number" id="passwordLength" value="12">
+
+<button onclick="generatePassword()">Generate Password</button>
+<button onclick="restorePassword()">Restore Password</button>
+
+<p id="result"></p>
+
+<button onclick="copyPassword()">Copy Password</button>
+<button onclick="saveToFile()">Save to File</button>
+
+<script>
+    function generatePassword() {
+        var key = document.getElementById('key').value;
+        var passwordLength = document.getElementById('passwordLength').value;
+
+        // Использование хэш-функции (SHA-256) для создания хэша из ключа
+        var hashedKey = sha256(key);
+
+        // Использование первых passwordLength символов хэша в качестве пароля
+        var password = hashedKey.substring(0, passwordLength);
+
+        // Выводим результат
+        document.getElementById('result').innerText = 'Generated Password: ' + password;
+    }
+
+    function restorePassword() {
+        var key = document.getElementById('key').value;
+        var passwordLength = document.getElementById('passwordLength').value;
+
+        // Использование хэш-функции (SHA-256) для создания хэша из ключа
+        var hashedKey = sha256(key);
+
+        // Использование первых passwordLength символов хэша в качестве пароля
+        var restoredPassword = hashedKey.substring(0, passwordLength);
+
+        // Выводим результат
+        document.getElementById('result').innerText = 'Restored Password: ' + restoredPassword;
+    }
+
+    function copyPassword() {
+        var passwordResult = document.getElementById('result');
+        var range = document.createRange();
+        range.selectNode(passwordResult);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+    }
+
+    function saveToFile() {
+        var password = document.getElementById('result').innerText;
+
+        // Создаем Blob с паролем
+        var blob = new Blob([password], { type: 'text/plain' });
+
+        // Создаем ссылку для скачивания
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(blob);
+        a.download = 'password.txt';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Функция для хэширования с использованием SHA-256
+    function sha256(message) {
+        // Создаем объект хэша
+        var hash = CryptoJS.SHA256(message);
+        
+        // Возвращаем хэш в виде строки
+        return hash.toString(CryptoJS.enc.Hex);
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+
+</body>
+</html>
